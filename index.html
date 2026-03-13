@@ -304,4 +304,201 @@
           <div class="row g-4">
             <div class="col-md-3"><label for="lifeAge" class="form-label fw-semibold">Age (client)</label><input type="number" class="form-control" id="lifeAge" min="18" max="75" value="35" required aria-describedby="lifeAgeHelp"></div>
             <div class="col-md-3"><label for="lifeGender" class="form-label fw-semibold">Gender</label><select class="form-select" id="lifeGender" aria-describedby="lifeGenderHelp"><option>Male</option><option>Female</option></select></div>
-            <div class="col
+            <div class="col-md-3"><label for="lifeSmoker" class="form-label fw-semibold">Smoker?</label><select class="form-select" id="lifeSmoker" aria-describedby="lifeSmokerHelp"><option>No</option><option>Yes</option></select></div>
+            <div class="col-md-3"><label for="lifeTerm" class="form-label fw-semibold">Term (years)</label><input type="number" class="form-control" id="lifeTerm" value="20" min="5" max="40" required aria-describedby="lifeTermHelp"></div>
+            <div class="col-md-4"><label for="lifeCover" class="form-label fw-semibold">Sum assured (AED)</label><input type="number" class="form-control" id="lifeCover" value="500000" min="100000" step="50000" required aria-describedby="lifeCoverHelp"></div>
+            <div class="col-md-4"><label for="lifeHealth" class="form-label fw-semibold">Health class</label><select class="form-select" id="lifeHealth" aria-describedby="lifeHealthHelp"><option>Preferred</option><option>Standard</option><option>High risk (rated)</option></select></div>
+            <div class="col-md-4"><label for="lifeRider" class="form-label fw-semibold">Rider (optional)</label><select class="form-select" id="lifeRider" aria-describedby="lifeRiderHelp"><option>None</option><option>Critical illness</option><option>Total disability</option></select></div>
+          </div>
+        `;
+      } else if (type === 'travel') {
+        html = `
+          <div class="row g-4">
+            <div class="col-md-4"><label for="travelDest" class="form-label fw-semibold">Destination region</label><select class="form-select" id="travelDest" aria-describedby="travelDestHelp"><option>Schengen</option><option>UK / Ireland</option><option>USA / Canada</option><option>UAE / GCC</option><option>Asia</option><option>Worldwide</option></select></div>
+            <div class="col-md-2"><label for="travelDays" class="form-label fw-semibold">Days</label><input type="number" class="form-control" id="travelDays" value="14" min="1" max="365" required aria-describedby="travelDaysHelp"></div>
+            <div class="col-md-3"><label for="travelPersons" class="form-label fw-semibold">Travelers</label><input type="number" class="form-control" id="travelPersons" value="1" min="1" max="10" required aria-describedby="travelPersonsHelp"></div>
+            <div class="col-md-3"><label for="travelAge" class="form-label fw-semibold">Age of main traveler</label><input type="number" class="form-control" id="travelAge" value="32" min="18" max="80" required aria-describedby="travelAgeHelp"></div>
+            <div class="col-md-6"><label for="travelCoverType" class="form-label fw-semibold">Coverage type</label><select class="form-select" id="travelCoverType" aria-describedby="travelCoverHelp"><option>Medical only</option><option>Medical + cancellation</option><option>Comprehensive (baggage, delay)</option></select></div>
+            <div class="col-md-6"><label for="travelTripCost" class="form-label fw-semibold">Trip cost (AED, if applicable)</label><input type="number" class="form-control" id="travelTripCost" value="5000" min="0" aria-describedby="tripCostHelp"></div>
+          </div>
+        `;
+      }
+      dynamicDiv.innerHTML = html;
+      lastType = type;
+    }
+
+    typeSelect.addEventListener('change', (e) => renderFields(e.target.value));
+
+    // ----- form submit: generate accurate quotes based on real formulas -----
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      // collect basics
+      const name = document.getElementById('clientName').value.trim();
+      const contact = document.getElementById('clientContact').value.trim();
+      const type = typeSelect.value;
+
+      if (!name || !contact || !type) {
+        alert('Please fill client name, contact and insurance type.');
+        return;
+      }
+
+      let details = '';
+      let quotes = [];
+
+      // ----- LIFE QUOTE SIMULATION (actuarial‑style) -----
+      if (type === 'life') {
+        const age = parseInt(document.getElementById('lifeAge')?.value) || 35;
+        const gender = document.getElementById('lifeGender')?.value || 'Male';
+        const smoker = document.getElementById('lifeSmoker')?.value || 'No';
+        const term = parseInt(document.getElementById('lifeTerm')?.value) || 20;
+        const cover = parseInt(document.getElementById('lifeCover')?.value) || 500000;
+        const health = document.getElementById('lifeHealth')?.value || 'Standard';
+        const rider = document.getElementById('lifeRider')?.value || 'None';
+
+        details = `Age ${age}, ${gender}, ${smoker}, ${health}, sum assured ${cover.toLocaleString()} AED, term ${term} years, rider: ${rider}`;
+
+        // base premium rate per 1000 coverage (annual) – varies by age, smoker, health
+        let baseRate = 0.8; // for age 35, non-smoker, standard
+        if (age > 50) baseRate += 2.5;
+        else if (age > 40) baseRate += 1.2;
+        else if (age > 30) baseRate += 0.3;
+        else baseRate = 0.6;  // age <=30
+
+        if (smoker === 'Yes') baseRate *= 2.2;
+        if (health === 'Preferred') baseRate *= 0.85;
+        if (health === 'High risk (rated)') baseRate *= 2.0;
+        if (gender === 'Female') baseRate *= 0.92;
+
+        // companies with different rating factors
+        const lifeCarriers = [
+          { name: 'AXA Life', factor: 1.0, rating: 4.7, features: ['Takaful option', 'Free health check'] },
+          { name: 'Allianz', factor: 1.08, rating: 4.8, features: ['Global portability', 'Critical illness rider'] },
+          { name: 'MetLife', factor: 0.95, rating: 4.6, features: ['Terminal illness benefit', 'Waiver of premium'] },
+          { name: 'Zurich', factor: 1.12, rating: 4.7, features: ['Accidental death', 'Convertible'] },
+          { name: 'Sukoon (Takaful)', factor: 0.98, rating: 4.5, features: ['Shariah‑compliant', 'Maturity benefit'] },
+          { name: 'GIG Gulf', factor: 1.05, rating: 4.4, features: ['Family plan discount', 'Online management'] }
+        ];
+
+        // generate quotes
+        lifeCarriers.forEach(c => {
+          let premiumPerThousand = baseRate * c.factor;
+          // term adjustment: shorter term = cheaper
+          premiumPerThousand *= (1 + (term - 20) * 0.01);
+          let annualPremium = (cover / 1000) * premiumPerThousand;
+          // round to nearest 10
+          annualPremium = Math.round(annualPremium / 10) * 10;
+          // Minimum floor reduced to 200 AED to allow variation for young/healthy clients
+          if (annualPremium < 200) annualPremium = 200;
+
+          quotes.push({
+            company: c.name,
+            premium: annualPremium,
+            rating: c.rating,
+            features: c.features,
+            logoIcon: 'bi-shield-check'
+          });
+        });
+      }
+
+      // ----- TRAVEL / VISA QUOTE SIMULATION -----
+      else if (type === 'travel') {
+        const dest = document.getElementById('travelDest')?.value || 'Schengen';
+        const days = parseInt(document.getElementById('travelDays')?.value) || 14;
+        const travelers = parseInt(document.getElementById('travelPersons')?.value) || 1;
+        const age = parseInt(document.getElementById('travelAge')?.value) || 32;
+        const coverType = document.getElementById('travelCoverType')?.value || 'Medical only';
+        const tripCost = parseFloat(document.getElementById('travelTripCost')?.value) || 0;
+
+        details = `${dest}, ${days} days, ${travelers} traveler(s), age ${age}, cover: ${coverType}`;
+
+        // base daily rate per person (AED)
+        let dailyRate = 12; // base for medical only, Schengen
+        if (dest.includes('USA') || dest.includes('Canada')) dailyRate = 22;
+        else if (dest.includes('UK')) dailyRate = 16;
+        else if (dest.includes('Asia')) dailyRate = 10;
+        else if (dest === 'UAE / GCC') dailyRate = 8;
+        else if (dest === 'Worldwide') dailyRate = 25;
+
+        if (coverType === 'Medical + cancellation') dailyRate *= 1.4;
+        if (coverType === 'Comprehensive (baggage, delay)') dailyRate *= 1.8;
+
+        // age loading: if age > 60, extra 75%
+        if (age > 60) dailyRate *= 1.75;
+        else if (age > 50) dailyRate *= 1.3;
+
+        // trip cost influence (only for cancellation)
+        let cancellationFactor = 1.0;
+        if (coverType.includes('cancellation') && tripCost > 2000) {
+          cancellationFactor += (tripCost / 10000) * 0.2;
+        }
+
+        const travelCarriers = [
+          { name: 'AXA Travel', factor: 1.0, rating: 4.8, features: ['24/7 assistance', 'Direct billing'] },
+          { name: 'Allianz Travel', factor: 1.1, rating: 4.7, features: ['Cancel for any reason', 'Baggage cover'] },
+          { name: 'Zurich Assist', factor: 0.95, rating: 4.6, features: ['Medical evacuation', 'Sports rider'] },
+          { name: 'GIG Travel', factor: 1.05, rating: 4.5, features: ['Visa compliant', 'Family discount'] },
+          { name: 'MetLife Travel', factor: 1.15, rating: 4.3, features: ['Pre‑existing medical', 'Rental car excess'] },
+          { name: 'Orient Insurance', factor: 0.9, rating: 4.4, features: ['Local support', 'Low excess'] }
+        ];
+
+        travelCarriers.forEach(c => {
+          let premium = dailyRate * days * travelers * cancellationFactor * c.factor;
+          premium = Math.round(premium / 5) * 5; // round to 5
+          if (premium < 30) premium = 30;
+
+          quotes.push({
+            company: c.name,
+            premium: premium,
+            rating: c.rating,
+            features: c.features,
+            logoIcon: 'bi-airplane'
+          });
+        });
+      }
+
+      // sort by premium ascending
+      quotes.sort((a,b) => a.premium - b.premium);
+
+      // build result HTML
+      let resultHtml = `<p class="mb-4"><span class="fw-bold">${name}</span> · ${contact}<br><span class="text-muted">${details}</span></p>`;
+
+      quotes.forEach((q, idx) => {
+        // stars from rating
+        let stars = '';
+        for (let i=0; i<5; i++) {
+          stars += i < Math.floor(q.rating) ? '★' : '☆';
+        }
+        resultHtml += `
+          <div class="card result-card mb-3 p-3">
+            <div class="d-flex align-items-center">
+              <i class="bi ${q.logoIcon} fs-2 text-gorya me-3"></i>
+              <div class="flex-grow-1">
+                <div class="d-flex flex-wrap align-items-center">
+                  <h5 class="mb-0 me-3">${q.company}</h5>
+                  <span class="rating-star me-2">${stars}</span><span class="text-muted small">${q.rating}</span>
+                </div>
+                <div class="mt-1">
+                  ${q.features.map(f => `<span class="feature-badge me-1">${f}</span>`).join('')}
+                </div>
+              </div>
+              <div class="text-end">
+                <span class="premium-large">${q.premium.toLocaleString()} AED</span><br>
+                <span class="text-muted small">${type==='life'?'annual':'total premium'}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      resultsList.innerHTML = resultHtml;
+      resultsDiv.style.display = 'block';
+      resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+
+    // initial empty fields
+    renderFields('');
+  })();
+</script>
+</body>
+</html>
