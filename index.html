@@ -1,338 +1,119 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gorya Insurance – Broker Multi‑Carrier Hub</title>
-  <!-- Bootstrap 5 + icons + fonts -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --gorya: #0a4b7a;
-      --gorya-light: #eef4fc;
-      --gorya-dark: #083e63;
-      --white: #ffffff;
-      --light-gray: #f8fafd;
-      --border-radius: 1.2rem;
-      --shadow: 0 15px 30px rgba(0,20,40,0.08);
-      --transition: 0.2s ease-in-out;
+// api/get-quote.js
+export default async function handler(req, res) {
+  // Set CORS headers (optional, but safe to keep)
+  res.setHeader('Access-Control-Allow-Origin', '*'); // Allow any origin (or specify your frontend domain)
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  try {
+    const {
+      type, name, contact,
+      age, gender, smoker, term, cover, health, rider,
+      destination, days, travelers, coverType, tripCost
+    } = req.body;
+
+    // 🔁 REAL INTEGRATION (commented out until Director.ai endpoint is known)
+    /*
+    const DIRECTOR_API_KEY = process.env.DIRECTOR_API_KEY;
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+    const AGENT_USER = process.env.AGENT_USER;
+    const AGENT_PASS = process.env.AGENT_PASS;
+
+    let task = '';
+    if (type === 'travel') {
+      task = `Go to 21stcenturytips.com. Log in with username ${AGENT_USER} and password ${AGENT_PASS}. Navigate to the "Visitors to Canada" insurance section. Fill out a quote request for a ${age}-year-old ${gender}, traveling for ${days} days. Trip destination: ${destination}, coverage type: ${coverType}, trip cost: ${tripCost} AED. Submit the form and return the final premium and a summary of coverage.`;
+    } else if (type === 'life') {
+      task = `Go to [life insurance portal]. Log in with ${AGENT_USER}:${AGENT_PASS}. Fill out a term life quote for a ${age}-year-old ${gender}, smoker: ${smoker}, health class: ${health}, sum assured: ${cover} AED, term: ${term} years, rider: ${rider}. Return the premium and key features.`;
     }
-    * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
-    .bg-gorya { background-color: var(--gorya) !important; }
-    .text-gorya { color: var(--gorya) !important; }
-    .border-gorya { border-color: var(--gorya) !important; }
-    .btn-gorya { background-color: var(--gorya); border-color: var(--gorya); color: var(--white); transition: var(--transition); }
-    .btn-gorya:hover { background-color: var(--gorya-dark); border-color: var(--gorya-dark); color: var(--white); }
-    .btn-outline-gorya { color: var(--gorya); border-color: var(--gorya); transition: var(--transition); }
-    .btn-outline-gorya:hover { background-color: var(--gorya); color: var(--white); }
-    .hero { background: linear-gradient(135deg, #f5f9ff 0%, #e3edf7 100%); padding: 3rem 0; }
-    .card-quote { border: none; border-radius: var(--border-radius); box-shadow: var(--shadow); transition: var(--transition); }
-    .card-quote:hover { box-shadow: 0 20px 35px rgba(10,75,122,0.12); }
-    .premium-large { font-size: 2rem; font-weight: 700; color: var(--gorya); line-height: 1.2; }
-    .feature-badge { background: #e9ecef; border-radius: 30px; padding: 0.3rem 1rem; font-size: 0.85rem; }
-    .section-title { font-weight: 700; letter-spacing: -0.02em; }
-    .dynamic-fields { background: var(--light-gray); border-radius: var(--border-radius); padding: 1.8rem; border: 1px solid rgba(10,75,122,0.1); }
-    .result-card { background: var(--white); border-radius: var(--border-radius); border-left: 5px solid var(--gorya); transition: var(--transition); }
-    .footer { background-color: #132433; color: #b0c7dd; }
-    .nav-link.active { font-weight: 600; }
-    .rating-star { color: #ffb347; font-size: 1.1rem; letter-spacing: 2px; }
-    @media (prefers-reduced-motion: reduce) { * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }
-  </style>
-</head>
-<body>
 
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-gorya sticky-top">
-  <div class="container">
-    <a class="navbar-brand fw-bold fs-3" href="#"><i class="bi bi-shield-fill-check me-2"></i>Gorya Insurance</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link active" href="#home" aria-current="page">Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="#broker-quote">Quote engine</a></li>
-        <li class="nav-item"><a class="nav-link" href="#carriers">Carriers</a></li>
-        <li class="nav-item"><a class="nav-link" href="#contact">Broker support</a></li>
-      </ul>
-    </div>
-  </div>
-</nav>
-
-<!-- Hero -->
-<section class="hero" id="home">
-  <div class="container">
-    <div class="row align-items-center g-5">
-      <div class="col-lg-6">
-        <span class="badge bg-white text-gorya px-3 py-2 mb-3 rounded-pill border"><i class="bi bi-stars me-2"></i>Broker‑centric platform</span>
-        <h1 class="display-5 fw-bold mb-3">Enter client data <span class="text-gorya">once</span><br>Get binding quotes from <span class="text-gorya">all leading insurers</span></h1>
-        <p class="lead fs-4">Specialised in <strong class="text-gorya">Life insurance</strong> and <strong class="text-gorya">Travel/Visa coverage</strong>. No more switching between portals – Gorya consolidates every offer.</p>
-        <div class="d-flex gap-3 mt-4">
-          <a href="#broker-quote" class="btn btn-gorya btn-lg px-4 py-3 rounded-4 shadow"><i class="bi bi-calculator me-2"></i>New business quote</a>
-          <a href="#carriers" class="btn btn-outline-gorya btn-lg px-4 py-3 rounded-4">View partner insurers</a>
-        </div>
-        <div class="mt-4 d-flex align-items-center gap-4">
-          <div><i class="bi bi-check-circle-fill text-gorya me-1"></i> 20+ top carriers</div>
-          <div><i class="bi bi-check-circle-fill text-gorya me-1"></i> Real‑time accurate premiums</div>
-        </div>
-      </div>
-      <div class="col-lg-6 text-center">
-        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='450' height='350' viewBox='0 0 450 350'%3E%3Crect width='450' height='350' fill='%23d9e8f5'/%3E%3Ctext x='90' y='180' font-family='Inter' font-size='36' fill='%230a4b7a' font-weight='bold'%3Elife · visa%3C/text%3E%3C/svg%3E" class="img-fluid" alt="insurance comparison">
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Main quote engine section -->
-<section id="broker-quote" class="py-5">
-  <div class="container">
-    <div class="row">
-      <div class="col-12">
-        <h2 class="section-title display-6 fw-bold mb-4"><i class="bi bi-file-spreadsheet me-2 text-gorya"></i>Broker quote request – one form, multiple carriers</h2>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-lg-8 mx-auto">
-        <div class="card card-quote p-4 p-xl-5">
-          <form id="quoteForm" novalidate>
-            <!-- client basic info -->
-            <div class="row g-4 mb-4">
-              <div class="col-md-6">
-                <label for="clientName" class="form-label fw-semibold">Client full name</label>
-                <input type="text" class="form-control form-control-lg" id="clientName" placeholder="e.g. Ahmed Al Mansouri" required>
-              </div>
-              <div class="col-md-6">
-                <label for="clientContact" class="form-label fw-semibold">Email / phone</label>
-                <input type="text" class="form-control form-control-lg" id="clientContact" placeholder="+971 50 123 4567" required>
-              </div>
-            </div>
-
-            <!-- insurance type selector -->
-            <div class="mb-4">
-              <label for="insType" class="form-label fw-semibold">Insurance category</label>
-              <select class="form-select form-select-lg" id="insType" required>
-                <option value="" disabled selected>– select product line –</option>
-                <option value="life">❤️ Life insurance (family takaful / term)</option>
-                <option value="travel">✈️ Travel & visa insurance (Schengen, GCC, int'l)</option>
-              </select>
-            </div>
-
-            <!-- dynamic fields -->
-            <div id="dynamicFieldsContainer" class="dynamic-fields mb-4">
-              <p class="text-muted mb-0">Select an insurance type to display detailed underwriting fields.</p>
-            </div>
-
-            <!-- submit button -->
-            <div class="d-grid">
-              <button type="submit" class="btn btn-gorya btn-lg rounded-4 py-3 fs-5" id="submitQuoteBtn">
-                <i class="bi bi-search-heart me-2"></i>Retrieve live quotes from all carriers
-              </button>
-            </div>
-            <p class="text-muted small text-center mt-3">* quotes are retrieved live via automation and enhanced with AI</p>
-          </form>
-
-          <!-- results area -->
-          <div id="quoteResults" class="mt-5 pt-4 border-top" style="display: none;">
-            <h4 class="fw-bold mb-4"><i class="bi bi-bar-chart-steps me-2 text-gorya"></i>Comparative quotes – valid for 30 days</h4>
-            <div id="resultsList"></div>
-            <div class="alert alert-light border mt-4 d-flex align-items-center" role="alert">
-              <i class="bi bi-download me-3 fs-4"></i>
-              <span>As a Gorya broker you can bind any quote directly or send to client. <a href="#" class="alert-link">Download summary</a></span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Partner carriers section -->
-<section id="carriers" class="py-5 bg-light">
-  <div class="container">
-    <h2 class="section-title text-center fw-bold mb-5">Underwriters connected to Gorya platform</h2>
-    <div class="row g-4 justify-content-center">
-      <div class="col-6 col-md-4 col-lg-2"><div class="card p-3 text-center border-0 shadow-sm"><i class="bi bi-building fs-1 text-gorya"></i><span class="fw-semibold">AXA Life</span></div></div>
-      <div class="col-6 col-md-4 col-lg-2"><div class="card p-3 text-center border-0 shadow-sm"><i class="bi bi-shield fs-1 text-gorya"></i><span class="fw-semibold">Allianz</span></div></div>
-      <div class="col-6 col-md-4 col-lg-2"><div class="card p-3 text-center border-0 shadow-sm"><i class="bi bi-globe fs-1 text-gorya"></i><span class="fw-semibold">Zurich</span></div></div>
-      <div class="col-6 col-md-4 col-lg-2"><div class="card p-3 text-center border-0 shadow-sm"><i class="bi bi-bank fs-1 text-gorya"></i><span class="fw-semibold">MetLife</span></div></div>
-      <div class="col-6 col-md-4 col-lg-2"><div class="card p-3 text-center border-0 shadow-sm"><i class="bi bi-heart fs-1 text-gorya"></i><span class="fw-semibold">Sukoon</span></div></div>
-      <div class="col-6 col-md-4 col-lg-2"><div class="card p-3 text-center border-0 shadow-sm"><i class="bi bi-passport fs-1 text-gorya"></i><span class="fw-semibold">GIG Gulf</span></div></div>
-    </div>
-  </div>
-</section>
-
-<!-- Broker contact / panel -->
-<section id="contact" class="py-5">
-  <div class="container">
-    <div class="row g-4">
-      <div class="col-md-6">
-        <h3 class="fw-bold mb-3"><i class="bi bi-headset text-gorya me-2"></i>Dedicated broker desk</h3>
-        <p class="fs-5">Every quote can be converted to a policy within minutes. Need binding or commission details? Our team is live.</p>
-        <ul class="list-unstyled">
-          <li class="mb-2"><i class="bi bi-telephone-fill text-gorya me-2"></i> +971 4 123 4567</li>
-          <li class="mb-2"><i class="bi bi-whatsapp text-gorya me-2"></i> +971 50 987 6543</li>
-          <li class="mb-2"><i class="bi bi-envelope-fill text-gorya me-2"></i> broker@gorya.ae</li>
-        </ul>
-      </div>
-      <div class="col-md-6">
-        <div class="bg-white p-4 rounded-4 border">
-          <h5><i class="bi bi-megaphone text-gorya me-2"></i>Your broker dashboard (coming soon)</h5>
-          <p class="text-muted">Save quotes, track commissions, and manage renewals – fully integrated.</p>
-          <button class="btn btn-outline-gorya rounded-pill px-4" disabled>Early access</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Footer -->
-<footer class="footer py-4">
-  <div class="container text-center">
-    <p class="mb-0">© 2025 Gorya Insurance Broker – accurate multi‑carrier quotes for life & visa professionals.</p>
-  </div>
-</footer>
-
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- Frontend logic -->
-<script>
-  (function() {
-    const typeSelect = document.getElementById('insType');
-    const dynamicDiv = document.getElementById('dynamicFieldsContainer');
-    const form = document.getElementById('quoteForm');
-    const resultsDiv = document.getElementById('quoteResults');
-    const resultsList = document.getElementById('resultsList');
-
-    let lastType = '';
-
-    function renderFields(type) {
-      if (!type) {
-        dynamicDiv.innerHTML = '<p class="text-muted mb-0">Select an insurance type to display detailed underwriting fields.</p>';
-        return;
-      }
-      if (lastType === type) return;
-      let html = '';
-      if (type === 'life') {
-        html = `
-          <div class="row g-4">
-            <div class="col-md-3"><label for="lifeAge" class="form-label fw-semibold">Age (client)</label><input type="number" class="form-control" id="lifeAge" min="18" max="75" value="35" required></div>
-            <div class="col-md-3"><label for="lifeGender" class="form-label fw-semibold">Gender</label><select class="form-select" id="lifeGender"><option>Male</option><option>Female</option></select></div>
-            <div class="col-md-3"><label for="lifeSmoker" class="form-label fw-semibold">Smoker?</label><select class="form-select" id="lifeSmoker"><option>No</option><option>Yes</option></select></div>
-            <div class="col-md-3"><label for="lifeTerm" class="form-label fw-semibold">Term (years)</label><input type="number" class="form-control" id="lifeTerm" value="20" min="5" max="40" required></div>
-            <div class="col-md-4"><label for="lifeCover" class="form-label fw-semibold">Sum assured (AED)</label><input type="number" class="form-control" id="lifeCover" value="500000" min="100000" step="50000" required></div>
-            <div class="col-md-4"><label for="lifeHealth" class="form-label fw-semibold">Health class</label><select class="form-select" id="lifeHealth"><option>Preferred</option><option>Standard</option><option>High risk (rated)</option></select></div>
-            <div class="col-md-4"><label for="lifeRider" class="form-label fw-semibold">Rider (optional)</label><select class="form-select" id="lifeRider"><option>None</option><option>Critical illness</option><option>Total disability</option></select></div>
-          </div>
-        `;
-      } else if (type === 'travel') {
-        html = `
-          <div class="row g-4">
-            <div class="col-md-4"><label for="travelDest" class="form-label fw-semibold">Destination region</label><select class="form-select" id="travelDest"><option>Schengen</option><option>UK / Ireland</option><option>USA / Canada</option><option>UAE / GCC</option><option>Asia</option><option>Worldwide</option></select></div>
-            <div class="col-md-2"><label for="travelDays" class="form-label fw-semibold">Days</label><input type="number" class="form-control" id="travelDays" value="14" min="1" max="365" required></div>
-            <div class="col-md-3"><label for="travelPersons" class="form-label fw-semibold">Travelers</label><input type="number" class="form-control" id="travelPersons" value="1" min="1" max="10" required></div>
-            <div class="col-md-3"><label for="travelAge" class="form-label fw-semibold">Age of main traveler</label><input type="number" class="form-control" id="travelAge" value="32" min="18" max="80" required></div>
-            <div class="col-md-6"><label for="travelCoverType" class="form-label fw-semibold">Coverage type</label><select class="form-select" id="travelCoverType"><option>Medical only</option><option>Medical + cancellation</option><option>Comprehensive (baggage, delay)</option></select></div>
-            <div class="col-md-6"><label for="travelTripCost" class="form-label fw-semibold">Trip cost (AED, if applicable)</label><input type="number" class="form-control" id="travelTripCost" value="5000" min="0"></div>
-          </div>
-        `;
-      }
-      dynamicDiv.innerHTML = html;
-      lastType = type;
-    }
-    typeSelect.addEventListener('change', (e) => renderFields(e.target.value));
-
-    // Handle form submit
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const name = document.getElementById('clientName').value.trim();
-      const contact = document.getElementById('clientContact').value.trim();
-      const type = typeSelect.value;
-      if (!name || !contact || !type) {
-        alert('Please fill client name, contact and insurance type.');
-        return;
-      }
-
-      // Collect dynamic fields
-      let formData = { name, contact, type };
-      if (type === 'life') {
-        formData.age = document.getElementById('lifeAge')?.value;
-        formData.gender = document.getElementById('lifeGender')?.value;
-        formData.smoker = document.getElementById('lifeSmoker')?.value;
-        formData.term = document.getElementById('lifeTerm')?.value;
-        formData.cover = document.getElementById('lifeCover')?.value;
-        formData.health = document.getElementById('lifeHealth')?.value;
-        formData.rider = document.getElementById('lifeRider')?.value;
-      } else if (type === 'travel') {
-        formData.destination = document.getElementById('travelDest')?.value;
-        formData.days = document.getElementById('travelDays')?.value;
-        formData.travelers = document.getElementById('travelPersons')?.value;
-        formData.age = document.getElementById('travelAge')?.value;
-        formData.coverType = document.getElementById('travelCoverType')?.value;
-        formData.tripCost = document.getElementById('travelTripCost')?.value;
-      }
-
-      // Show loading
-      resultsDiv.style.display = 'block';
-      resultsList.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-gorya" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2">Retrieving live quotes from carrier portals...</p></div>';
-
-      try {
-        // IMPORTANT: Replace with your actual Vercel backend URL
-        const BACKEND_URL = 'https://your-backend.vercel.app/api/get-quote';
-        const response = await fetch(BACKEND_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData)
-        });
-
-        if (!response.ok) throw new Error(`Server error: ${response.status}`);
-        const data = await response.json();
-
-        // Display quotes
-        displayQuotes(data.quotes, name, contact, formData);
-      } catch (error) {
-        resultsList.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
-      }
+    const directorResponse = await fetch('https://api.director.ai/v1/tasks', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${DIRECTOR_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ task })
     });
 
-    function displayQuotes(quotes, name, contact, formData) {
-      let details = '';
-      if (formData.type === 'life') {
-        details = `Age ${formData.age}, ${formData.gender}, ${formData.smoker}, ${formData.health}, sum assured ${Number(formData.cover).toLocaleString()} AED, term ${formData.term} years, rider: ${formData.rider}`;
-      } else {
-        details = `${formData.destination}, ${formData.days} days, ${formData.travelers} traveler(s), age ${formData.age}, cover: ${formData.coverType}`;
-      }
-      let resultHtml = `<p class="mb-4"><span class="fw-bold">${name}</span> · ${contact}<br><span class="text-muted">${details}</span></p>`;
-      quotes.forEach(q => {
-        let stars = '';
-        for (let i=0; i<5; i++) stars += i < Math.floor(q.rating) ? '★' : '☆';
-        resultHtml += `
-          <div class="card result-card mb-3 p-3">
-            <div class="d-flex align-items-center">
-              <i class="bi ${q.logoIcon || 'bi-shield-check'} fs-2 text-gorya me-3"></i>
-              <div class="flex-grow-1">
-                <div class="d-flex flex-wrap align-items-center">
-                  <h5 class="mb-0 me-3">${q.company}</h5>
-                  <span class="rating-star me-2">${stars}</span><span class="text-muted small">${q.rating}</span>
-                </div>
-                <div class="mt-1">${(q.features || []).map(f => `<span class="feature-badge me-1">${f}</span>`).join('')}</div>
-              </div>
-              <div class="text-end">
-                <span class="premium-large">${q.premium.toLocaleString()} AED</span><br>
-                <span class="text-muted small">${formData.type==='life'?'annual':'total premium'}</span>
-              </div>
-            </div>
-          </div>
-        `;
-      });
-      resultsList.innerHTML = resultHtml;
+    if (!directorResponse.ok) {
+      throw new Error(`Director.ai error: ${await directorResponse.text()}`);
     }
 
-    renderFields('');
-  })();
-</script>
-</body>
-</html>
+    const directorResult = await directorResponse.json();
+    const rawQuoteText = directorResult.result || directorResult.output || JSON.stringify(directorResult);
+
+    const geminiPrompt = `
+      Extract the following information from the insurance quote text below:
+      - Company name
+      - Premium amount in AED (just the number)
+      - A list of key features (up to 3)
+      - A rating out of 5 (if not present, use 4.5)
+
+      Return ONLY a valid JSON array with one object containing these fields: 
+      { "company": string, "premium": number, "features": [string], "rating": number, "logoIcon": "bi-shield-check" }
+
+      Quote text:
+      ${rawQuoteText}
+    `;
+
+    const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: geminiPrompt }] }]
+      })
+    });
+
+    if (!geminiResponse.ok) {
+      throw new Error(`Gemini error: ${await geminiResponse.text()}`);
+    }
+
+    const geminiData = await geminiResponse.json();
+    const text = geminiData.candidates[0].content.parts[0].text;
+    const jsonStr = text.replace(/```json|```/g, '').trim();
+    let structuredQuotes = JSON.parse(jsonStr);
+    if (!Array.isArray(structuredQuotes)) structuredQuotes = [structuredQuotes];
+
+    return res.status(200).json({ quotes: structuredQuotes });
+    */
+
+    // 🟢 FALLBACK: Return dummy quotes so frontend can test
+    const dummyQuotes = [
+      {
+        company: 'AXA Life',
+        premium: type === 'life' ? 1250 : 85,
+        features: ['Takaful option', 'Free health check'],
+        rating: 4.7,
+        logoIcon: 'bi-shield-check'
+      },
+      {
+        company: 'Allianz',
+        premium: type === 'life' ? 1380 : 97,
+        features: ['Global portability', 'Critical illness rider'],
+        rating: 4.8,
+        logoIcon: 'bi-shield-check'
+      },
+      {
+        company: 'Zurich',
+        premium: type === 'life' ? 1120 : 79,
+        features: ['Accidental death', 'Convertible'],
+        rating: 4.7,
+        logoIcon: 'bi-shield-check'
+      }
+    ];
+
+    return res.status(200).json({ quotes: dummyQuotes });
+
+  } catch (error) {
+    console.error('Backend error:', error);
+    return res.status(500).json({ error: error.message });
+  }
+}
