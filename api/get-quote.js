@@ -1,51 +1,72 @@
 // api/get-quote.js
 export default async function handler(req, res) {
-  // Set CORS headers to allow your frontend
-  res.setHeader('Access-Control-Allow-Origin', 'https://honeyamn10-source.github.io'); // replace with your actual GitHub Pages URL
+  // CORS headers – replace with your exact GitHub Pages URL
+  const allowedOrigin = 'https://honeyamn10-source.github.io';
+  res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
+  // Handle preflight OPTIONS request
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
+  // Only allow POST
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const {
-    type, name, contact,
-    age, gender, smoker, term, cover, health, rider,
-    destination, days, travelers, coverType, tripCost
-  } = req.body;
-
-  // Get API keys from environment variables
-  const DIRECTOR_API_KEY = process.env.DIRECTOR_API_KEY;
-  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-  const AGENT_USER = process.env.AGENT_USER;
-  const AGENT_PASS = process.env.AGENT_PASS;
-
   try {
-    // --- Step 1: Build Director.ai task ---
+    const {
+      type, name, contact,
+      age, gender, smoker, term, cover, health, rider,
+      destination, days, travelers, coverType, tripCost
+    } = req.body;
+
+    // For now, we'll return dummy quotes to test the connection.
+    // Later, you can replace this with real Director.ai integration.
+    const dummyQuotes = [
+      {
+        company: 'AXA Life',
+        premium: type === 'life' ? 1250 : 85,
+        features: ['Takaful option', 'Free health check'],
+        rating: 4.7,
+        logoIcon: 'bi-shield-check'
+      },
+      {
+        company: 'Allianz',
+        premium: type === 'life' ? 1380 : 97,
+        features: ['Global portability', 'Critical illness rider'],
+        rating: 4.8,
+        logoIcon: 'bi-shield-check'
+      },
+      {
+        company: 'Zurich',
+        premium: type === 'life' ? 1120 : 79,
+        features: ['Accidental death', 'Convertible'],
+        rating: 4.7,
+        logoIcon: 'bi-shield-check'
+      }
+    ];
+
+    // Send back the dummy quotes
+    return res.status(200).json({ quotes: dummyQuotes });
+
+    /* ===== REAL INTEGRATION (uncomment when Director.ai is ready) =====
+    const DIRECTOR_API_KEY = process.env.DIRECTOR_API_KEY;
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+    const AGENT_USER = process.env.AGENT_USER;
+    const AGENT_PASS = process.env.AGENT_PASS;
+
+    // Build Director.ai task based on type
     let task = '';
     if (type === 'travel') {
-      task = `
-        Go to 21stcenturytips.com. Log in with username ${AGENT_USER} and password ${AGENT_PASS}.
-        Navigate to the "Visitors to Canada" insurance section.
-        Fill out a quote request for a ${age}-year-old ${gender}, traveling for ${days} days.
-        Trip destination: ${destination}, coverage type: ${coverType}, trip cost: ${tripCost} AED.
-        Submit the form and return the final premium and a summary of coverage.
-      `;
+      task = `Go to 21stcenturytips.com. Log in with username ${AGENT_USER} and password ${AGENT_PASS}. Navigate to the "Visitors to Canada" insurance section. Fill out a quote request for a ${age}-year-old ${gender}, traveling for ${days} days. Trip destination: ${destination}, coverage type: ${coverType}, trip cost: ${tripCost} AED. Submit the form and return the final premium and a summary of coverage.`;
     } else if (type === 'life') {
-      // Example for life insurance (adjust as needed)
-      task = `
-        Go to [life insurance portal]. Log in with ${AGENT_USER}:${AGENT_PASS}.
-        Fill out a term life quote for a ${age}-year-old ${gender}, smoker: ${smoker}, health class: ${health}, sum assured: ${cover} AED, term: ${term} years, rider: ${rider}.
-        Return the premium and key features.
-      `;
+      task = `Go to [life insurance portal]. Log in with ${AGENT_USER}:${AGENT_PASS}. Fill out a term life quote for a ${age}-year-old ${gender}, smoker: ${smoker}, health class: ${health}, sum assured: ${cover} AED, term: ${term} years, rider: ${rider}. Return the premium and key features.`;
     }
 
-    // --- Step 2: Call Director.ai (replace URL with actual endpoint) ---
+    // Call Director.ai (replace URL with actual endpoint)
     const directorResponse = await fetch('https://api.director.ai/v1/tasks', {
       method: 'POST',
       headers: {
@@ -62,7 +83,7 @@ export default async function handler(req, res) {
     const directorResult = await directorResponse.json();
     const rawQuoteText = directorResult.result || directorResult.output || JSON.stringify(directorResult);
 
-    // --- Step 3: Use Gemini to structure the result ---
+    // Use Gemini to structure the result
     const geminiPrompt = `
       Extract the following information from the insurance quote text below:
       - Company name
@@ -86,38 +107,29 @@ export default async function handler(req, res) {
     });
 
     if (!geminiResponse.ok) {
-      // Fallback
-      const fallbackQuotes = [{
-        company: '21st Century Tips',
-        premium: 1250,
-        features: ['Emergency Medical', 'Trip Cancellation', 'Baggage Loss'],
-        rating: 4.5,
-        logoIcon: 'bi-shield-check'
-      }];
-      return res.status(200).json({ quotes: fallbackQuotes });
+      throw new Error(`Gemini error: ${await geminiResponse.text()}`);
     }
 
     const geminiData = await geminiResponse.json();
-    let structuredQuotes;
-    try {
-      const text = geminiData.candidates[0].content.parts[0].text;
-      const jsonStr = text.replace(/```json|```/g, '').trim();
-      structuredQuotes = JSON.parse(jsonStr);
-      if (!Array.isArray(structuredQuotes)) structuredQuotes = [structuredQuotes];
-    } catch (e) {
-      structuredQuotes = [{
-        company: '21st Century Tips',
-        premium: 1250,
-        features: ['Emergency Medical', 'Trip Cancellation', 'Baggage Loss'],
-        rating: 4.5,
-        logoIcon: 'bi-shield-check'
-      }];
-    }
+    const text = geminiData.candidates[0].content.parts[0].text;
+    const jsonStr = text.replace(/```json|```/g, '').trim();
+    let structuredQuotes = JSON.parse(jsonStr);
+    if (!Array.isArray(structuredQuotes)) structuredQuotes = [structuredQuotes];
 
     return res.status(200).json({ quotes: structuredQuotes });
+    ===== END REAL INTEGRATION ===== */
 
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: error.message });
+    console.error('Backend error:', error);
+    // Return a fallback so frontend doesn't break
+    return res.status(200).json({
+      quotes: [{
+        company: 'Sample Quote',
+        premium: 1250,
+        features: ['Emergency Medical', 'Trip Cancellation'],
+        rating: 4.5,
+        logoIcon: 'bi-shield-check'
+      }]
+    });
   }
 }
