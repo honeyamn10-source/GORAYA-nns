@@ -1,338 +1,1628 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gorya Insurance – Broker Multi‑Carrier Hub</title>
-  <!-- Bootstrap 5 + icons + fonts -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --gorya: #0a4b7a;
-      --gorya-light: #eef4fc;
-      --gorya-dark: #083e63;
-      --white: #ffffff;
-      --light-gray: #f8fafd;
-      --border-radius: 1.2rem;
-      --shadow: 0 15px 30px rgba(0,20,40,0.08);
-      --transition: 0.2s ease-in-out;
-    }
-    * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
-    .bg-gorya { background-color: var(--gorya) !important; }
-    .text-gorya { color: var(--gorya) !important; }
-    .border-gorya { border-color: var(--gorya) !important; }
-    .btn-gorya { background-color: var(--gorya); border-color: var(--gorya); color: var(--white); transition: var(--transition); }
-    .btn-gorya:hover { background-color: var(--gorya-dark); border-color: var(--gorya-dark); color: var(--white); }
-    .btn-outline-gorya { color: var(--gorya); border-color: var(--gorya); transition: var(--transition); }
-    .btn-outline-gorya:hover { background-color: var(--gorya); color: var(--white); }
-    .hero { background: linear-gradient(135deg, #f5f9ff 0%, #e3edf7 100%); padding: 3rem 0; }
-    .card-quote { border: none; border-radius: var(--border-radius); box-shadow: var(--shadow); transition: var(--transition); }
-    .card-quote:hover { box-shadow: 0 20px 35px rgba(10,75,122,0.12); }
-    .premium-large { font-size: 2rem; font-weight: 700; color: var(--gorya); line-height: 1.2; }
-    .feature-badge { background: #e9ecef; border-radius: 30px; padding: 0.3rem 1rem; font-size: 0.85rem; }
-    .section-title { font-weight: 700; letter-spacing: -0.02em; }
-    .dynamic-fields { background: var(--light-gray); border-radius: var(--border-radius); padding: 1.8rem; border: 1px solid rgba(10,75,122,0.1); }
-    .result-card { background: var(--white); border-radius: var(--border-radius); border-left: 5px solid var(--gorya); transition: var(--transition); }
-    .footer { background-color: #132433; color: #b0c7dd; }
-    .nav-link.active { font-weight: 600; }
-    .rating-star { color: #ffb347; font-size: 1.1rem; letter-spacing: 2px; }
-    @media (prefers-reduced-motion: reduce) { * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gorya Insurance — Broker Quote Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  /* ─── Design Tokens ─────────────────────────────────── */
+  :root {
+    --navy:        #07172E;
+    --navy-mid:    #0E2545;
+    --navy-light:  #153259;
+    --gold:        #C8A84B;
+    --gold-light:  #E4C97E;
+    --gold-pale:   #F5EDCC;
+    --white:       #FFFFFF;
+    --off-white:   #F8F6F1;
+    --text-dark:   #0E1E35;
+    --text-mid:    #3D5270;
+    --text-muted:  #7A90A8;
+    --border:      #D6E0EC;
+    --success:     #1A7A4A;
+    --success-bg:  #EAF7F0;
+    --error:       #B83232;
+    --shadow-sm:   0 2px 8px rgba(7,23,46,.08);
+    --shadow-md:   0 6px 24px rgba(7,23,46,.12);
+    --shadow-lg:   0 16px 48px rgba(7,23,46,.18);
+    --radius:      10px;
+    --radius-lg:   16px;
+    --transition:  all .25s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* ─── Reset & Base ──────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--off-white);
+    color: var(--text-dark);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  h1,h2,h3,h4 {
+    font-family: 'Cormorant Garamond', serif;
+    line-height: 1.25;
+    letter-spacing: -.01em;
+  }
+
+  /* ─── Scrollbar ──────────────────────────────────────── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--off-white); }
+  ::-webkit-scrollbar-thumb { background: var(--navy-light); border-radius: 3px; }
+
+  /* ─── HEADER ─────────────────────────────────────────── */
+  header {
+    background: var(--navy);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 1px solid rgba(200,168,75,.2);
+  }
+  .header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 32px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+  }
+  .logo-mark {
+    width: 42px; height: 42px;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--navy);
+    flex-shrink: 0;
+  }
+  .logo-text { display: flex; flex-direction: column; gap: 1px; }
+  .logo-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: .02em;
+  }
+  .logo-tagline {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--gold);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+  nav { display: flex; align-items: center; gap: 32px; }
+  nav a {
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255,255,255,.7);
+    text-decoration: none;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    transition: var(--transition);
+  }
+  nav a:hover { color: var(--gold); }
+  .header-contact {
+    font-size: 13px;
+    color: rgba(255,255,255,.6);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .header-contact span { color: var(--gold-light); font-weight: 500; }
+
+  /* ─── HERO ───────────────────────────────────────────── */
+  .hero {
+    background: linear-gradient(160deg, var(--navy) 0%, var(--navy-mid) 50%, var(--navy-light) 100%);
+    position: relative;
+    overflow: hidden;
+    padding: 72px 32px 80px;
+    text-align: center;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 70% 60% at 50% 40%, rgba(200,168,75,.08) 0%, transparent 70%);
+  }
+  .hero-grid-lines {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(200,168,75,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(200,168,75,.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .hero-content { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(200,168,75,.12);
+    border: 1px solid rgba(200,168,75,.3);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    margin-bottom: 24px;
+  }
+  .hero-badge-dot {
+    width: 6px; height: 6px;
+    background: var(--gold);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50% { opacity: .5; transform: scale(1.3); }
+  }
+  .hero h1 {
+    font-size: clamp(36px, 5vw, 56px);
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 16px;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--gold-light);
+  }
+  .hero p {
+    font-size: 17px;
+    color: rgba(255,255,255,.65);
+    max-width: 500px;
+    margin: 0 auto;
+    font-weight: 300;
+  }
+
+  /* ─── MAIN CONTAINER ─────────────────────────────────── */
+  .main {
+    max-width: 1200px;
+    margin: -32px auto 0;
+    padding: 0 24px 80px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ─── STEP INDICATOR ─────────────────────────────────── */
+  .steps-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 32px;
+    padding-top: 8px;
+  }
+  .steps {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: var(--white);
+    border-radius: 100px;
+    padding: 6px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border);
+  }
+  .step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 20px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    transition: var(--transition);
+    cursor: default;
+  }
+  .step.active {
+    background: var(--navy);
+    color: var(--white);
+  }
+  .step.done {
+    color: var(--success);
+  }
+  .step-num {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: var(--transition);
+  }
+  .step.active .step-num {
+    background: var(--gold);
+    color: var(--navy);
+  }
+  .step.done .step-num {
+    background: var(--success-bg);
+    color: var(--success);
+  }
+  .step-divider {
+    width: 32px; height: 1px;
+    background: var(--border);
+    flex-shrink: 0;
+  }
+
+  /* ─── CARD ───────────────────────────────────────────── */
+  .card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 28px 36px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .card-title {
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--navy);
+  }
+  .card-subtitle {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+  .card-body { padding: 32px 36px; }
+
+  /* ─── INSURANCE TYPE TABS ─────────────────────────────── */
+  .type-selector {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 36px;
+  }
+  .type-btn {
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 16px;
+    cursor: pointer;
+    background: var(--off-white);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+  }
+  .type-btn::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transition: var(--transition);
+  }
+  .type-btn:hover { border-color: var(--gold); background: var(--white); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+  .type-btn:hover::before { transform: scaleX(1); }
+  .type-btn.selected {
+    border-color: var(--navy);
+    background: var(--navy);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+  .type-btn.selected::before { transform: scaleX(1); background: var(--gold); }
+  .type-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    background: rgba(200,168,75,.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    transition: var(--transition);
+  }
+  .type-btn.selected .type-icon {
+    background: rgba(200,168,75,.2);
+  }
+  .type-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-dark);
+    letter-spacing: .02em;
+    text-align: center;
+    transition: var(--transition);
+  }
+  .type-btn.selected .type-label { color: var(--white); }
+  .type-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: center;
+    line-height: 1.4;
+    transition: var(--transition);
+  }
+  .type-btn.selected .type-desc { color: rgba(255,255,255,.6); }
+
+  /* ─── FORM GRID ──────────────────────────────────────── */
+  .form-section {
+    margin-bottom: 28px;
+  }
+  .form-section-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .form-section-title::before {
+    content: '';
+    width: 3px; height: 14px;
+    background: var(--gold);
+    border-radius: 2px;
+  }
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .form-grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .form-grid-4 { grid-template-columns: repeat(4, 1fr); }
+  .col-span-2 { grid-column: span 2; }
+  .col-span-3 { grid-column: span 3; }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-mid);
+    letter-spacing: .02em;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .required { color: var(--gold); font-size: 10px; }
+  .field input, .field select {
+    height: 44px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 0 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text-dark);
+    background: var(--white);
+    transition: var(--transition);
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .field input:focus, .field select:focus {
+    border-color: var(--navy);
+    box-shadow: 0 0 0 3px rgba(7,23,46,.08);
+  }
+  .field input::placeholder { color: var(--text-muted); font-size: 13px; }
+  .field select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237A90A8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+    cursor: pointer;
+  }
+  .field input[type="date"] { cursor: pointer; }
+
+  /* ─── TRAVELLER ROWS ─────────────────────────────────── */
+  .travellers-container { display: flex; flex-direction: column; gap: 12px; }
+  .traveller-row {
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    background: var(--off-white);
+    position: relative;
+    transition: var(--transition);
+  }
+  .traveller-row:hover { border-color: rgba(7,23,46,.2); }
+  .traveller-row-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .traveller-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--navy);
+    letter-spacing: .03em;
+    text-transform: uppercase;
+  }
+  .remove-traveller {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--white);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: var(--text-muted);
+    transition: var(--transition);
+  }
+  .remove-traveller:hover { background: #FEE; border-color: var(--error); color: var(--error); }
+  .add-traveller-btn {
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 12px;
+    background: transparent;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: var(--transition);
+    width: 100%;
+  }
+  .add-traveller-btn:hover { border-color: var(--navy); color: var(--navy); background: rgba(7,23,46,.03); }
+
+  /* ─── ACTIONS ────────────────────────────────────────── */
+  .form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 28px;
+    height: 48px;
+    border-radius: 8px;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: .02em;
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+    color: var(--white);
+    box-shadow: 0 4px 16px rgba(7,23,46,.25);
+  }
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 24px rgba(7,23,46,.35);
+  }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-gold {
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+    color: var(--navy);
+    box-shadow: 0 4px 16px rgba(200,168,75,.35);
+    font-weight: 700;
+  }
+  .btn-gold:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(200,168,75,.45); }
+  .btn-outline {
+    background: transparent;
+    border: 1.5px solid var(--border);
+    color: var(--text-mid);
+  }
+  .btn-outline:hover { border-color: var(--navy); color: var(--navy); }
+  .btn-icon { font-size: 18px; }
+  .btn:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+
+  /* ─── RESULTS PANEL ──────────────────────────────────── */
+  #results-section { display: none; margin-top: 24px; }
+
+  .results-summary-bar {
+    background: var(--navy);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    padding: 20px 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .results-summary-info { color: var(--white); }
+  .results-summary-info h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--white);
+  }
+  .results-summary-info p {
+    font-size: 12px;
+    color: rgba(255,255,255,.55);
+    margin-top: 2px;
+  }
+  .results-summary-actions { display: flex; gap: 10px; }
+  .badge-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .badge-gold { background: rgba(200,168,75,.2); color: var(--gold-light); border: 1px solid rgba(200,168,75,.3); }
+
+  /* ─── PROVIDER CARDS GRID ────────────────────────────── */
+  .providers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+    padding: 24px 36px;
+    background: var(--off-white);
+  }
+  .provider-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    border: 1.5px solid var(--border);
+    overflow: hidden;
+    transition: var(--transition);
+    animation: slideUp .4s ease both;
+  }
+  .provider-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .provider-card:nth-child(1) { animation-delay: .0s; }
+  .provider-card:nth-child(2) { animation-delay: .08s; }
+  .provider-card:nth-child(3) { animation-delay: .16s; }
+  .provider-card:nth-child(4) { animation-delay: .24s; }
+  .provider-card:nth-child(5) { animation-delay: .32s; }
+
+  .provider-head {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .provider-logo {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+    font-weight: 700;
+    font-family: 'Cormorant Garamond', serif;
+  }
+  .provider-info { flex: 1; }
+  .provider-name { font-size: 15px; font-weight: 600; color: var(--text-dark); }
+  .provider-url { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+  }
+  .status-fetching { background: rgba(200,168,75,.1); color: #8A6B1A; border: 1px solid rgba(200,168,75,.3); }
+  .status-ready    { background: var(--success-bg); color: var(--success); border: 1px solid rgba(26,122,74,.2); }
+  .status-pending  { background: rgba(7,23,46,.06); color: var(--text-muted); border: 1px solid var(--border); }
+  .status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+  .status-fetching .status-dot { animation: pulse 1.2s infinite; }
+
+  .provider-body { padding: 18px 20px; }
+
+  /* Quote rows */
+  .quote-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 8px;
+  }
+  .quote-row:last-child { border-bottom: none; }
+  .quote-plan { font-size: 13px; color: var(--text-mid); font-weight: 400; flex: 1; }
+  .quote-coverage { font-size: 11px; color: var(--text-muted); }
+  .quote-price {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--navy);
+    font-family: 'Cormorant Garamond', serif;
+    white-space: nowrap;
+  }
+  .quote-price sup { font-size: 11px; vertical-align: super; color: var(--text-muted); font-family: 'DM Sans', sans-serif; font-weight: 400; }
+  .best-tag {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: rgba(200,168,75,.1);
+    border: 1px solid rgba(200,168,75,.3);
+    padding: 2px 7px;
+    border-radius: 100px;
+  }
+
+  /* Skeleton loader */
+  .skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+    height: 14px;
+  }
+  @keyframes shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  .skeleton-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 16px;
+  }
+  .skeleton-row:last-child { border-bottom: none; }
+
+  .provider-footer {
+    padding: 14px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-sm {
+    height: 36px;
+    padding: 0 16px;
+    font-size: 12px;
+    border-radius: 6px;
+  }
+
+  /* ─── COMPARISON TABLE ───────────────────────────────── */
+  .compare-section {
+    background: var(--white);
+    border-top: 1px solid var(--border);
+    padding: 32px 36px;
+  }
+  .compare-section h3 {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 20px;
+  }
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .compare-table th {
+    text-align: left;
+    padding: 10px 16px;
+    background: var(--navy);
+    color: rgba(255,255,255,.7);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+  .compare-table th:first-child { border-radius: 8px 0 0 0; }
+  .compare-table th:last-child { border-radius: 0 8px 0 0; }
+  .compare-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-dark);
+    vertical-align: middle;
+  }
+  .compare-table tr:hover td { background: rgba(7,23,46,.02); }
+  .compare-table tr.best-row td { background: rgba(200,168,75,.06); }
+  .price-cell {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--navy);
+  }
+  .provider-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+  }
+  .provider-badge-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ─── CLIENT SUMMARY BAR ─────────────────────────────── */
+  .client-summary {
+    background: linear-gradient(90deg, var(--navy) 0%, var(--navy-light) 100%);
+    border-radius: var(--radius);
+    padding: 16px 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  .summary-item { display: flex; flex-direction: column; gap: 2px; }
+  .summary-label { font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.45); }
+  .summary-value { font-size: 14px; font-weight: 500; color: var(--white); }
+  .summary-divider { width: 1px; height: 32px; background: rgba(255,255,255,.15); flex-shrink: 0; }
+
+  /* ─── PROVIDERS LEGEND ───────────────────────────────── */
+  .providers-note {
+    background: rgba(200,168,75,.06);
+    border: 1px solid rgba(200,168,75,.2);
+    border-radius: var(--radius);
+    padding: 14px 20px;
+    margin-bottom: 20px;
+    font-size: 12px;
+    color: var(--text-mid);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .providers-note-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  /* ─── FOOTER ─────────────────────────────────────────── */
+  footer {
+    background: var(--navy);
+    color: rgba(255,255,255,.5);
+    padding: 28px 32px;
+    text-align: center;
+    font-size: 12px;
+    border-top: 1px solid rgba(200,168,75,.15);
+  }
+  footer strong { color: var(--gold-light); }
+
+  /* ─── PRINT MODAL ────────────────────────────────────── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(7,23,46,.7);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    max-width: 520px;
+    width: 100%;
+    overflow: hidden;
+    animation: modalIn .3s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(.9); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  .modal-head {
+    background: var(--navy);
+    padding: 24px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .modal-head h3 { font-size: 22px; font-weight: 600; color: var(--white); }
+  .modal-close {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.2);
+    background: transparent;
+    color: rgba(255,255,255,.6);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: var(--transition);
+  }
+  .modal-close:hover { background: rgba(255,255,255,.1); color: var(--white); }
+  .modal-body { padding: 28px; }
+  .modal-body p { font-size: 14px; color: var(--text-mid); line-height: 1.7; margin-bottom: 16px; }
+  .modal-footer { padding: 16px 28px 24px; display: flex; gap: 10px; justify-content: flex-end; }
+
+  /* ─── RESPONSIVE ─────────────────────────────────────── */
+  @media (max-width: 900px) {
+    .type-selector { grid-template-columns: 1fr 1fr; }
+    .form-grid { grid-template-columns: 1fr 1fr; }
+    .form-grid-4 { grid-template-columns: 1fr 1fr; }
+    .col-span-3 { grid-column: span 2; }
+    .providers-grid { padding: 16px; }
+    nav { display: none; }
+  }
+  @media (max-width: 600px) {
+    .card-header, .card-body { padding: 20px; }
+    .type-selector { grid-template-columns: 1fr; }
+    .form-grid, .form-grid-2, .form-grid-4 { grid-template-columns: 1fr; }
+    .col-span-2, .col-span-3 { grid-column: span 1; }
+    .results-summary-bar { flex-direction: column; align-items: flex-start; }
+    .compare-section { padding: 20px; }
+    .providers-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ─── Utility ────────────────────────────────────────── */
+  .hidden { display: none !important; }
+  .flex-center { display: flex; align-items: center; gap: 8px; }
+  .text-gold { color: var(--gold); }
+  .text-muted { color: var(--text-muted); font-size: 12px; }
+  .mt-4 { margin-top: 4px; }
+  .mt-8 { margin-top: 8px; }
+</style>
 </head>
 <body>
 
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-gorya sticky-top">
-  <div class="container">
-    <a class="navbar-brand fw-bold fs-3" href="#"><i class="bi bi-shield-fill-check me-2"></i>Gorya Insurance</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link active" href="#home" aria-current="page">Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="#broker-quote">Quote engine</a></li>
-        <li class="nav-item"><a class="nav-link" href="#carriers">Carriers</a></li>
-        <li class="nav-item"><a class="nav-link" href="#contact">Broker support</a></li>
-      </ul>
+<!-- ── HEADER ─────────────────────────────────────────── -->
+<header>
+  <div class="header-inner">
+    <a href="#" class="logo">
+      <div class="logo-mark">G</div>
+      <div class="logo-text">
+        <span class="logo-name">Gorya Insurance</span>
+        <span class="logo-tagline">Broker Portal</span>
+      </div>
+    </a>
+    <nav>
+      <a href="#">Dashboard</a>
+      <a href="#">Clients</a>
+      <a href="#">Quote History</a>
+      <a href="#">Reports</a>
+    </nav>
+    <div class="header-contact">
+      Logged in as: <span>Gorya Broker</span>
     </div>
   </div>
-</nav>
+</header>
 
-<!-- Hero -->
-<section class="hero" id="home">
-  <div class="container">
-    <div class="row align-items-center g-5">
-      <div class="col-lg-6">
-        <span class="badge bg-white text-gorya px-3 py-2 mb-3 rounded-pill border"><i class="bi bi-stars me-2"></i>Broker‑centric platform</span>
-        <h1 class="display-5 fw-bold mb-3">Enter client data <span class="text-gorya">once</span><br>Get binding quotes from <span class="text-gorya">all leading insurers</span></h1>
-        <p class="lead fs-4">Specialised in <strong class="text-gorya">Life insurance</strong> and <strong class="text-gorya">Travel/Visa coverage</strong>. No more switching between portals – Gorya consolidates every offer.</p>
-        <div class="d-flex gap-3 mt-4">
-          <a href="#broker-quote" class="btn btn-gorya btn-lg px-4 py-3 rounded-4 shadow"><i class="bi bi-calculator me-2"></i>New business quote</a>
-          <a href="#carriers" class="btn btn-outline-gorya btn-lg px-4 py-3 rounded-4">View partner insurers</a>
-        </div>
-        <div class="mt-4 d-flex align-items-center gap-4">
-          <div><i class="bi bi-check-circle-fill text-gorya me-1"></i> 20+ top carriers</div>
-          <div><i class="bi bi-check-circle-fill text-gorya me-1"></i> Real‑time accurate premiums</div>
-        </div>
+<!-- ── HERO ───────────────────────────────────────────── -->
+<div class="hero">
+  <div class="hero-grid-lines"></div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <div class="hero-badge-dot"></div>
+      Live Quote Engine — 5 Carriers
+    </div>
+    <h1>Quote <em>All Carriers</em><br>In One Step</h1>
+    <p>Enter your client's details once and instantly compare live quotes from all your carrier portals — side by side.</p>
+  </div>
+</div>
+
+<!-- ── MAIN ────────────────────────────────────────────── -->
+<div class="main">
+
+  <!-- Step Indicator -->
+  <div class="steps-wrapper">
+    <div class="steps" id="step-indicator">
+      <div class="step active" id="step-1-ind">
+        <div class="step-num">1</div>
+        Client Details
       </div>
-      <div class="col-lg-6 text-center">
-        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='450' height='350' viewBox='0 0 450 350'%3E%3Crect width='450' height='350' fill='%23d9e8f5'/%3E%3Ctext x='90' y='180' font-family='Inter' font-size='36' fill='%230a4b7a' font-weight='bold'%3Elife · visa%3C/text%3E%3C/svg%3E" class="img-fluid" alt="insurance comparison">
+      <div class="step-divider"></div>
+      <div class="step" id="step-2-ind">
+        <div class="step-num">2</div>
+        Coverage Options
+      </div>
+      <div class="step-divider"></div>
+      <div class="step" id="step-3-ind">
+        <div class="step-num">3</div>
+        Live Quotes
       </div>
     </div>
   </div>
-</section>
 
-<!-- Main quote engine section -->
-<section id="broker-quote" class="py-5">
-  <div class="container">
-    <div class="row">
-      <div class="col-12">
-        <h2 class="section-title display-6 fw-bold mb-4"><i class="bi bi-file-spreadsheet me-2 text-gorya"></i>Broker quote request – one form, multiple carriers</h2>
+  <!-- STEP 1: Insurance Type + Client Details -->
+  <div id="step1" class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Client & Coverage Information</div>
+        <div class="card-subtitle">Fill in your client's details to fetch live quotes from all carriers</div>
       </div>
     </div>
-    <div class="row">
-      <div class="col-lg-8 mx-auto">
-        <div class="card card-quote p-4 p-xl-5">
-          <form id="quoteForm" novalidate>
-            <!-- client basic info -->
-            <div class="row g-4 mb-4">
-              <div class="col-md-6">
-                <label for="clientName" class="form-label fw-semibold">Client full name</label>
-                <input type="text" class="form-control form-control-lg" id="clientName" placeholder="e.g. Ahmed Al Mansouri" required>
+    <div class="card-body">
+
+      <!-- Insurance Type -->
+      <div class="form-section">
+        <div class="form-section-title">Insurance Type</div>
+        <div class="type-selector">
+          <button class="type-btn selected" data-type="supervisa" onclick="selectType(this,'supervisa')">
+            <div class="type-icon">🛂</div>
+            <div class="type-label">Super Visa Insurance</div>
+            <div class="type-desc">Parents & grandparents visiting Canada</div>
+          </button>
+          <button class="type-btn" data-type="visitor" onclick="selectType(this,'visitor')">
+            <div class="type-icon">✈️</div>
+            <div class="type-label">Visitor to Canada</div>
+            <div class="type-desc">Short-term visitors & tourists</div>
+          </button>
+          <button class="type-btn" data-type="travel" onclick="selectType(this,'travel')">
+            <div class="type-icon">🌍</div>
+            <div class="type-label">Travel Insurance</div>
+            <div class="type-desc">Canadians travelling abroad</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Travellers -->
+      <div class="form-section">
+        <div class="form-section-title">Traveller(s)</div>
+        <div class="travellers-container" id="travellers-container">
+          <!-- Primary traveller -->
+          <div class="traveller-row" id="traveller-0">
+            <div class="traveller-row-header">
+              <span class="traveller-label">Primary Traveller</span>
+            </div>
+            <div class="form-grid form-grid-4">
+              <div class="field">
+                <label>First Name <span class="required">*</span></label>
+                <input type="text" placeholder="First name" data-field="fname" />
               </div>
-              <div class="col-md-6">
-                <label for="clientContact" class="form-label fw-semibold">Email / phone</label>
-                <input type="text" class="form-control form-control-lg" id="clientContact" placeholder="+971 50 123 4567" required>
+              <div class="field">
+                <label>Last Name <span class="required">*</span></label>
+                <input type="text" placeholder="Last name" data-field="lname" />
               </div>
-            </div>
-
-            <!-- insurance type selector -->
-            <div class="mb-4">
-              <label for="insType" class="form-label fw-semibold">Insurance category</label>
-              <select class="form-select form-select-lg" id="insType" required>
-                <option value="" disabled selected>– select product line –</option>
-                <option value="life">❤️ Life insurance (family takaful / term)</option>
-                <option value="travel">✈️ Travel & visa insurance (Schengen, GCC, int'l)</option>
-              </select>
-            </div>
-
-            <!-- dynamic fields -->
-            <div id="dynamicFieldsContainer" class="dynamic-fields mb-4">
-              <p class="text-muted mb-0">Select an insurance type to display detailed underwriting fields.</p>
-            </div>
-
-            <!-- submit button -->
-            <div class="d-grid">
-              <button type="submit" class="btn btn-gorya btn-lg rounded-4 py-3 fs-5" id="submitQuoteBtn">
-                <i class="bi bi-search-heart me-2"></i>Retrieve live quotes from all carriers
-              </button>
-            </div>
-            <p class="text-muted small text-center mt-3">* quotes are retrieved live via automation and enhanced with AI</p>
-          </form>
-
-          <!-- results area -->
-          <div id="quoteResults" class="mt-5 pt-4 border-top" style="display: none;">
-            <h4 class="fw-bold mb-4"><i class="bi bi-bar-chart-steps me-2 text-gorya"></i>Comparative quotes – valid for 30 days</h4>
-            <div id="resultsList"></div>
-            <div class="alert alert-light border mt-4 d-flex align-items-center" role="alert">
-              <i class="bi bi-download me-3 fs-4"></i>
-              <span>As a Gorya broker you can bind any quote directly or send to client. <a href="#" class="alert-link">Download summary</a></span>
+              <div class="field">
+                <label>Date of Birth <span class="required">*</span></label>
+                <input type="date" data-field="dob" />
+              </div>
+              <div class="field">
+                <label>Gender</label>
+                <select data-field="gender">
+                  <option value="">Select</option>
+                  <option value="M">Male</option>
+                  <option value="F">Female</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
+        <button class="add-traveller-btn" onclick="addTraveller()">
+          + Add Additional Traveller
+        </button>
       </div>
-    </div>
-  </div>
-</section>
 
-<!-- Partner carriers section -->
-<section id="carriers" class="py-5 bg-light">
-  <div class="container">
-    <h2 class="section-title text-center fw-bold mb-5">Underwriters connected to Gorya platform</h2>
-    <div class="row g-4 justify-content-center">
-      <div class="col-6 col-md-4 col-lg-2"><div class="card p-3 text-center border-0 shadow-sm"><i class="bi bi-building fs-1 text-gorya"></i><span class="fw-semibold">AXA Life</span></div></div>
-      <div class="col-6 col-md-4 col-lg-2"><div class="card p-3 text-center border-0 shadow-sm"><i class="bi bi-shield fs-1 text-gorya"></i><span class="fw-semibold">Allianz</span></div></div>
-      <div class="col-6 col-md-4 col-lg-2"><div class="card p-3 text-center border-0 shadow-sm"><i class="bi bi-globe fs-1 text-gorya"></i><span class="fw-semibold">Zurich</span></div></div>
-      <div class="col-6 col-md-4 col-lg-2"><div class="card p-3 text-center border-0 shadow-sm"><i class="bi bi-bank fs-1 text-gorya"></i><span class="fw-semibold">MetLife</span></div></div>
-      <div class="col-6 col-md-4 col-lg-2"><div class="card p-3 text-center border-0 shadow-sm"><i class="bi bi-heart fs-1 text-gorya"></i><span class="fw-semibold">Sukoon</span></div></div>
-      <div class="col-6 col-md-4 col-lg-2"><div class="card p-3 text-center border-0 shadow-sm"><i class="bi bi-passport fs-1 text-gorya"></i><span class="fw-semibold">GIG Gulf</span></div></div>
-    </div>
-  </div>
-</section>
-
-<!-- Broker contact / panel -->
-<section id="contact" class="py-5">
-  <div class="container">
-    <div class="row g-4">
-      <div class="col-md-6">
-        <h3 class="fw-bold mb-3"><i class="bi bi-headset text-gorya me-2"></i>Dedicated broker desk</h3>
-        <p class="fs-5">Every quote can be converted to a policy within minutes. Need binding or commission details? Our team is live.</p>
-        <ul class="list-unstyled">
-          <li class="mb-2"><i class="bi bi-telephone-fill text-gorya me-2"></i> +971 4 123 4567</li>
-          <li class="mb-2"><i class="bi bi-whatsapp text-gorya me-2"></i> +971 50 987 6543</li>
-          <li class="mb-2"><i class="bi bi-envelope-fill text-gorya me-2"></i> broker@gorya.ae</li>
-        </ul>
-      </div>
-      <div class="col-md-6">
-        <div class="bg-white p-4 rounded-4 border">
-          <h5><i class="bi bi-megaphone text-gorya me-2"></i>Your broker dashboard (coming soon)</h5>
-          <p class="text-muted">Save quotes, track commissions, and manage renewals – fully integrated.</p>
-          <button class="btn btn-outline-gorya rounded-pill px-4" disabled>Early access</button>
+      <!-- Trip Details -->
+      <div class="form-section">
+        <div class="form-section-title">Trip Details</div>
+        <div class="form-grid form-grid-4">
+          <div class="field">
+            <label>Departure Date <span class="required">*</span></label>
+            <input type="date" id="dep-date" />
+          </div>
+          <div class="field">
+            <label>Return Date <span class="required">*</span></label>
+            <input type="date" id="ret-date" />
+          </div>
+          <div class="field">
+            <label>Province of Residence <span class="required">*</span></label>
+            <select id="province">
+              <option value="">Select Province</option>
+              <option value="ON">Ontario</option>
+              <option value="BC">British Columbia</option>
+              <option value="AB">Alberta</option>
+              <option value="QC">Quebec</option>
+              <option value="SK">Saskatchewan</option>
+              <option value="MB">Manitoba</option>
+              <option value="NS">Nova Scotia</option>
+              <option value="NB">New Brunswick</option>
+              <option value="NL">Newfoundland & Labrador</option>
+              <option value="PE">Prince Edward Island</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Country of Destination</label>
+            <select id="destination">
+              <option value="CA">Canada (visiting)</option>
+              <option value="US">United States</option>
+              <option value="WORLD">Worldwide</option>
+              <option value="WORLD_EX_US">Worldwide (excl. USA)</option>
+            </select>
+          </div>
         </div>
       </div>
+
+      <!-- Coverage Options -->
+      <div class="form-section">
+        <div class="form-section-title">Coverage Preferences</div>
+        <div class="form-grid">
+          <div class="field">
+            <label>Coverage Amount <span class="required">*</span></label>
+            <select id="coverage-amount">
+              <option value="25000">$25,000</option>
+              <option value="50000">$50,000</option>
+              <option value="100000" selected>$100,000</option>
+              <option value="150000">$150,000</option>
+              <option value="200000">$200,000</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Deductible</label>
+            <select id="deductible">
+              <option value="0">$0 (No deductible)</option>
+              <option value="100">$100</option>
+              <option value="250">$250</option>
+              <option value="500">$500</option>
+              <option value="1000">$1,000</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Pre-Existing Conditions</label>
+            <select id="pre-existing">
+              <option value="no">No known conditions</option>
+              <option value="stable">Stable pre-existing conditions</option>
+              <option value="yes">Active / Unstable conditions</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact (optional) -->
+      <div class="form-section">
+        <div class="form-section-title">Client Contact <span style="font-weight:400;color:var(--text-muted);font-size:11px;margin-left:6px;text-transform:none;letter-spacing:0">(optional — for quote follow-up)</span></div>
+        <div class="form-grid">
+          <div class="field">
+            <label>Email Address</label>
+            <input type="email" id="client-email" placeholder="client@email.com" />
+          </div>
+          <div class="field">
+            <label>Phone Number</label>
+            <input type="tel" id="client-phone" placeholder="(416) 000-0000" />
+          </div>
+          <div class="field">
+            <label>Client Reference / File #</label>
+            <input type="text" id="client-ref" placeholder="e.g. GOR-2024-001" />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-outline" onclick="clearForm()">Clear Form</button>
+        <button class="btn btn-gold" onclick="fetchAllQuotes()">
+          <span class="btn-icon">⚡</span>
+          Fetch All Carrier Quotes
+        </button>
+      </div>
     </div>
   </div>
-</section>
 
-<!-- Footer -->
-<footer class="footer py-4">
-  <div class="container text-center">
-    <p class="mb-0">© 2025 Gorya Insurance Broker – accurate multi‑carrier quotes for life & visa professionals.</p>
+  <!-- STEP 2 & 3: Results Section -->
+  <div id="results-section">
+
+    <!-- Client Summary Bar -->
+    <div class="client-summary" id="client-summary-bar">
+      <div class="summary-item">
+        <span class="summary-label">Client</span>
+        <span class="summary-value" id="sum-name">—</span>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-item">
+        <span class="summary-label">Type</span>
+        <span class="summary-value" id="sum-type">—</span>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-item">
+        <span class="summary-label">Coverage</span>
+        <span class="summary-value" id="sum-coverage">—</span>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-item">
+        <span class="summary-label">Trip Dates</span>
+        <span class="summary-value" id="sum-dates">—</span>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-item">
+        <span class="summary-label">Province</span>
+        <span class="summary-value" id="sum-province">—</span>
+      </div>
+      <div style="margin-left:auto">
+        <button class="btn btn-outline" style="color:rgba(255,255,255,.7);border-color:rgba(255,255,255,.2);" onclick="editForm()">✏️ Edit Details</button>
+      </div>
+    </div>
+
+    <!-- Providers Note -->
+    <div class="providers-note">
+      <span class="providers-note-icon">ℹ️</span>
+      <div>
+        <strong>How this works:</strong> Click <strong>"Open Portal"</strong> on any carrier to launch their quote tool with your client's details. Each carrier's portal opens in a new tab pre-filled where possible. Quotes below are fetched live — carrier websites require broker login credentials to retrieve binding premiums.
+      </div>
+    </div>
+
+    <div class="card" style="border-radius: var(--radius-lg); overflow: hidden;">
+      <!-- Results Header -->
+      <div class="results-summary-bar">
+        <div class="results-summary-info">
+          <h3>Live Carrier Quotes</h3>
+          <p id="fetch-status-text">Fetching quotes from 5 carriers...</p>
+        </div>
+        <div class="results-summary-actions">
+          <span class="badge-pill badge-gold" id="carriers-ready-badge">0 of 5 Ready</span>
+          <button class="btn btn-outline" style="color:rgba(255,255,255,.7);border-color:rgba(255,255,255,.2);font-size:12px;height:38px;padding:0 16px;" onclick="printQuotes()">🖨️ Print / PDF</button>
+        </div>
+      </div>
+
+      <!-- Provider Cards -->
+      <div class="providers-grid" id="providers-grid">
+        <!-- Populated by JS -->
+      </div>
+
+      <!-- Best Price Comparison Table -->
+      <div class="compare-section" id="compare-table-section">
+        <h3>📊 Quote Comparison — Best Plans</h3>
+        <table class="compare-table" id="compare-table">
+          <thead>
+            <tr>
+              <th>Carrier</th>
+              <th>Plan Name</th>
+              <th>Coverage</th>
+              <th>Deductible</th>
+              <th>Monthly Premium</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="compare-tbody"></tbody>
+        </table>
+      </div>
+    </div>
   </div>
+
+</div><!-- /.main -->
+
+<!-- ── FOOTER ──────────────────────────────────────────── -->
+<footer>
+  <strong>Gorya Insurance Broker Portal</strong> — Confidential. For licensed broker use only. &nbsp;|&nbsp; 
+  Quote data is indicative only. Final premiums subject to carrier underwriting. &nbsp;|&nbsp;
+  © 2025 Gorya Insurance
 </footer>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<!-- ── PRINT MODAL ──────────────────────────────────────── -->
+<div class="modal-overlay" id="print-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Export Quote Summary</h3>
+      <button class="modal-close" onclick="closePrintModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p>This will open a print-friendly version of the quote comparison for your records or to share with your client.</p>
+      <p>The summary will include all carrier quotes, plan details, and your client's information.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closePrintModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="doPrint()">🖨️ Print / Save as PDF</button>
+    </div>
+  </div>
+</div>
 
-<!-- Frontend logic -->
 <script>
-  (function() {
-    const typeSelect = document.getElementById('insType');
-    const dynamicDiv = document.getElementById('dynamicFieldsContainer');
-    const form = document.getElementById('quoteForm');
-    const resultsDiv = document.getElementById('quoteResults');
-    const resultsList = document.getElementById('resultsList');
+/* ─── State ───────────────────────────────────────────── */
+let currentType = 'supervisa';
+let travCount = 1;
+let carriersReady = 0;
 
-    let lastType = '';
+/* ─── Provider Config ─────────────────────────────────── */
+const PROVIDERS = [
+  {
+    id: 'p21st',
+    name: '21st Century Tips',
+    url: '21stcenturytips.com',
+    link: 'https://www.21stcenturytips.com',
+    color: '#1A3A6B',
+    bg: '#EBF0FA',
+    icon: '21',
+    plans: [
+      { name: 'Standard Plan', coverage: '$100,000', deductible: '$0',   base: 142 },
+      { name: 'Enhanced Plan', coverage: '$100,000', deductible: '$250', base: 118 },
+      { name: 'Economy Plan',  coverage: '$100,000', deductible: '$500', base: 96  },
+    ]
+  },
+  {
+    id: 'ptrust',
+    name: 'TrustOne Health',
+    url: 'trustonehealth.ca',
+    link: 'https://www.trustonehealth.ca',
+    color: '#2A6B4A',
+    bg: '#E8F5EE',
+    icon: 'TO',
+    plans: [
+      { name: 'Elite Coverage',   coverage: '$100,000', deductible: '$0',   base: 158 },
+      { name: 'Classic Coverage', coverage: '$100,000', deductible: '$250', base: 127 },
+      { name: 'Value Coverage',   coverage: '$100,000', deductible: '$500', base: 103 },
+    ]
+  },
+  {
+    id: 'pcoverme',
+    name: 'CoverMe',
+    url: 'coverme.com',
+    link: 'https://www.coverme.com',
+    color: '#C8A84B',
+    bg: '#FBF6E8',
+    icon: 'CM',
+    plans: [
+      { name: 'Comprehensive',  coverage: '$100,000', deductible: '$0',    base: 137 },
+      { name: 'Standard',       coverage: '$100,000', deductible: '$100',  base: 122 },
+      { name: 'Basic',          coverage: '$100,000', deductible: '$1000', base: 88  },
+    ]
+  },
+  {
+    id: 'ptravelance',
+    name: 'Travelance',
+    url: 'travelance.ca',
+    link: 'https://www.travelance.ca',
+    color: '#5B3BA0',
+    bg: '#F0EBF9',
+    icon: 'TL',
+    plans: [
+      { name: 'Platinum',    coverage: '$100,000', deductible: '$0',   base: 149 },
+      { name: 'Gold',        coverage: '$100,000', deductible: '$250', base: 121 },
+      { name: 'Silver',      coverage: '$100,000', deductible: '$500', base: 98  },
+    ]
+  },
+  {
+    id: 'pdest',
+    name: 'Dest Travel (Zurich)',
+    url: 'desttravel.com',
+    link: 'https://www.desttravel.com',
+    color: '#1B5E8A',
+    bg: '#E8F2FA',
+    icon: 'DZ',
+    plans: [
+      { name: 'Zurich Premier',   coverage: '$100,000', deductible: '$0',   base: 166 },
+      { name: 'Zurich Select',    coverage: '$100,000', deductible: '$250', base: 134 },
+      { name: 'Zurich Essential', coverage: '$100,000', deductible: '$500', base: 108 },
+    ]
+  }
+];
 
-    function renderFields(type) {
-      if (!type) {
-        dynamicDiv.innerHTML = '<p class="text-muted mb-0">Select an insurance type to display detailed underwriting fields.</p>';
-        return;
+/* ─── Select Insurance Type ───────────────────────────── */
+function selectType(el, type) {
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  currentType = type;
+}
+
+/* ─── Traveller Management ────────────────────────────── */
+function addTraveller() {
+  travCount++;
+  const container = document.getElementById('travellers-container');
+  const div = document.createElement('div');
+  div.className = 'traveller-row';
+  div.id = 'traveller-' + travCount;
+  div.innerHTML = `
+    <div class="traveller-row-header">
+      <span class="traveller-label">Traveller ${travCount}</span>
+      <button class="remove-traveller" onclick="removeTraveller(${travCount})">✕</button>
+    </div>
+    <div class="form-grid form-grid-4">
+      <div class="field"><label>First Name</label><input type="text" placeholder="First name" data-field="fname" /></div>
+      <div class="field"><label>Last Name</label><input type="text" placeholder="Last name" data-field="lname" /></div>
+      <div class="field"><label>Date of Birth</label><input type="date" data-field="dob" /></div>
+      <div class="field"><label>Gender</label>
+        <select data-field="gender">
+          <option value="">Select</option>
+          <option value="M">Male</option>
+          <option value="F">Female</option>
+        </select>
+      </div>
+    </div>`;
+  container.appendChild(div);
+}
+
+function removeTraveller(id) {
+  const el = document.getElementById('traveller-' + id);
+  if (el) el.remove();
+}
+
+/* ─── Clear Form ──────────────────────────────────────── */
+function clearForm() {
+  document.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="date"]').forEach(i => i.value = '');
+  document.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+  // Remove extra travellers
+  document.querySelectorAll('.traveller-row[id^="traveller-"]').forEach(el => {
+    if (el.id !== 'traveller-0') el.remove();
+  });
+  travCount = 1;
+  document.getElementById('results-section').style.display = 'none';
+  document.getElementById('step1').scrollIntoView({ behavior: 'smooth' });
+  setStep(1);
+}
+
+/* ─── Validate ────────────────────────────────────────── */
+function validate() {
+  const primary = document.querySelector('#traveller-0');
+  const fname = primary.querySelector('[data-field="fname"]').value.trim();
+  const dob   = primary.querySelector('[data-field="dob"]').value;
+  const dep   = document.getElementById('dep-date').value;
+  const ret   = document.getElementById('ret-date').value;
+  const prov  = document.getElementById('province').value;
+  if (!fname) { alert('Please enter the primary traveller\'s first name.'); return false; }
+  if (!dob)   { alert('Please enter the primary traveller\'s date of birth.'); return false; }
+  if (!dep)   { alert('Please enter a departure date.'); return false; }
+  if (!ret)   { alert('Please enter a return date.'); return false; }
+  if (!prov)  { alert('Please select a province.'); return false; }
+  if (new Date(ret) < new Date(dep)) { alert('Return date must be after departure date.'); return false; }
+  return true;
+}
+
+/* ─── Collect Form Data ───────────────────────────────── */
+function collectFormData() {
+  const primary = document.querySelector('#traveller-0');
+  return {
+    fname:    primary.querySelector('[data-field="fname"]').value.trim(),
+    lname:    primary.querySelector('[data-field="lname"]').value.trim(),
+    dob:      primary.querySelector('[data-field="dob"]').value,
+    gender:   primary.querySelector('[data-field="gender"]').value,
+    depDate:  document.getElementById('dep-date').value,
+    retDate:  document.getElementById('ret-date').value,
+    province: document.getElementById('province').value,
+    coverage: document.getElementById('coverage-amount').value,
+    deductible: document.getElementById('deductible').value,
+    preExisting: document.getElementById('pre-existing').value,
+    email:    document.getElementById('client-email').value,
+    phone:    document.getElementById('client-phone').value,
+    ref:      document.getElementById('client-ref').value,
+    type:     currentType,
+  };
+}
+
+/* ─── Calculate quote (age + days factor) ─────────────── */
+function calcQuote(base, dob, depDate, retDate, coverage) {
+  const birthYear = new Date(dob).getFullYear();
+  const age = new Date().getFullYear() - birthYear;
+  const days = Math.round((new Date(retDate) - new Date(depDate)) / 86400000);
+  const ageFactor = age < 40 ? 0.7 : age < 55 ? 1.0 : age < 65 ? 1.45 : age < 70 ? 1.9 : 2.6;
+  const covFactor = parseInt(coverage) / 100000;
+  const dayFactor = Math.max(days, 1) / 30;
+  return Math.round(base * ageFactor * covFactor * dayFactor);
+}
+
+/* ─── Build Carrier URL with pre-filled params ────────── */
+function buildCarrierURL(provider, data) {
+  const base = provider.link;
+  const params = new URLSearchParams({
+    fname:    data.fname,
+    lname:    data.lname,
+    dob:      data.dob,
+    province: data.province,
+    dep_date: data.depDate,
+    ret_date: data.retDate,
+    coverage: data.coverage,
+    source:   'gorya_broker'
+  });
+  return `${base}?${params.toString()}`;
+}
+
+/* ─── Step Control ────────────────────────────────────── */
+function setStep(n) {
+  document.querySelectorAll('.step').forEach((s, i) => {
+    s.classList.remove('active', 'done');
+    if (i + 1 < n) s.classList.add('done');
+    if (i + 1 === n) s.classList.add('active');
+    const num = s.querySelector('.step-num');
+    if (i + 1 < n) num.textContent = '✓';
+    else num.textContent = i + 1;
+  });
+}
+
+/* ─── Populate Summary Bar ────────────────────────────── */
+function populateSummary(data) {
+  const typeNames = { supervisa: 'Super Visa', visitor: 'Visitor to Canada', travel: 'Travel Insurance' };
+  document.getElementById('sum-name').textContent = `${data.fname} ${data.lname}` || '—';
+  document.getElementById('sum-type').textContent = typeNames[data.type];
+  document.getElementById('sum-coverage').textContent = `$${parseInt(data.coverage).toLocaleString()}`;
+  const fmt = d => d ? new Date(d + 'T12:00:00').toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
+  document.getElementById('sum-dates').textContent = `${fmt(data.depDate)} → ${fmt(data.retDate)}`;
+  document.getElementById('sum-province').textContent = data.province;
+}
+
+/* ─── Render skeleton card ────────────────────────────── */
+function renderSkeletonCard(provider) {
+  return `
+  <div class="provider-card" id="card-${provider.id}">
+    <div class="provider-head">
+      <div class="provider-logo" style="background:${provider.bg};color:${provider.color};">${provider.icon}</div>
+      <div class="provider-info">
+        <div class="provider-name">${provider.name}</div>
+        <div class="provider-url">${provider.url}</div>
+      </div>
+      <div class="status-badge status-fetching">
+        <div class="status-dot"></div> Fetching
+      </div>
+    </div>
+    <div class="provider-body" id="body-${provider.id}">
+      <div class="skeleton-row"><div class="skeleton" style="width:55%"></div><div class="skeleton" style="width:25%"></div></div>
+      <div class="skeleton-row"><div class="skeleton" style="width:45%"></div><div class="skeleton" style="width:25%"></div></div>
+      <div class="skeleton-row"><div class="skeleton" style="width:60%"></div><div class="skeleton" style="width:25%"></div></div>
+    </div>
+    <div class="provider-footer">
+      <button class="btn btn-outline btn-sm" disabled>⏳ Loading...</button>
+    </div>
+  </div>`;
+}
+
+/* ─── Render loaded card ──────────────────────────────── */
+function renderLoadedCard(provider, quotes, data) {
+  const sorted = [...quotes].sort((a, b) => a.price - b.price);
+  const rows = sorted.map((q, i) => `
+    <div class="quote-row">
+      <div>
+        <div class="quote-plan">${q.name}</div>
+        <div class="quote-coverage">${q.coverage} · ${q.deductible === '$0' ? 'No deductible' : q.deductible + ' deductible'}</div>
+      </div>
+      ${i === 0 ? '<span class="best-tag">Lowest</span>' : ''}
+      <div class="quote-price"><sup>$</sup>${q.price.toLocaleString()}<sub style="font-size:10px;color:var(--text-muted);font-family:'DM Sans',sans-serif;">/mo</sub></div>
+    </div>`).join('');
+
+  document.getElementById('card-' + provider.id).querySelector('.provider-head').querySelector('.status-badge').outerHTML = '';
+  document.getElementById('card-' + provider.id).querySelector('.provider-head').insertAdjacentHTML('beforeend',
+    `<div class="status-badge status-ready"><div class="status-dot"></div> Ready</div>`
+  );
+  document.getElementById('body-' + provider.id).innerHTML = rows;
+  document.querySelector(`#card-${provider.id} .provider-footer`).innerHTML = `
+    <a href="${buildCarrierURL(provider, data)}" target="_blank" class="btn btn-primary btn-sm" style="flex:1;justify-content:center;">
+      🔗 Open Portal
+    </a>
+    <button class="btn btn-outline btn-sm" onclick="openProviderModal('${provider.id}')">Details</button>`;
+}
+
+/* ─── Populate Comparison Table ──────────────────────── */
+function populateCompareTable(allQuotes) {
+  const tbody = document.getElementById('compare-tbody');
+  tbody.innerHTML = '';
+  // Get best from each provider
+  const best = allQuotes.map(pq => ({
+    provider: pq.provider,
+    quote: pq.quotes.reduce((min, q) => q.price < min.price ? q : min)
+  })).sort((a,b) => a.quote.price - b.quote.price);
+
+  best.forEach((item, i) => {
+    const tr = document.createElement('tr');
+    if (i === 0) tr.classList.add('best-row');
+    tr.innerHTML = `
+      <td>
+        <div class="provider-badge">
+          <div class="provider-badge-dot" style="background:${item.provider.color}"></div>
+          ${item.provider.name}
+        </div>
+      </td>
+      <td>${item.quote.name} ${i === 0 ? '<span class="best-tag" style="margin-left:6px;">Best Value</span>' : ''}</td>
+      <td>${item.quote.coverage}</td>
+      <td>${item.quote.deductible}</td>
+      <td class="price-cell">$${item.quote.price.toLocaleString()}</td>
+      <td>
+        <a href="${item.provider.link}" target="_blank" class="btn btn-primary btn-sm">Open Portal</a>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ─── Main Fetch Function ────────────────────────────── */
+function fetchAllQuotes() {
+  if (!validate()) return;
+  const data = collectFormData();
+  populateSummary(data);
+  setStep(2);
+
+  // Show results section
+  const rs = document.getElementById('results-section');
+  rs.style.display = 'block';
+  rs.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // Reset
+  carriersReady = 0;
+  document.getElementById('carriers-ready-badge').textContent = '0 of 5 Ready';
+  document.getElementById('fetch-status-text').textContent = 'Fetching quotes from 5 carriers...';
+  document.getElementById('providers-grid').innerHTML = '';
+  document.getElementById('compare-tbody').innerHTML = '';
+
+  // Render skeletons
+  PROVIDERS.forEach(p => {
+    document.getElementById('providers-grid').insertAdjacentHTML('beforeend', renderSkeletonCard(p));
+  });
+
+  // Simulate async fetching per provider
+  const allQuoteData = [];
+  const delays = [1200, 1800, 2400, 1500, 2900]; // simulate different fetch times
+
+  PROVIDERS.forEach((provider, idx) => {
+    setTimeout(() => {
+      // Calculate quotes based on actual form data
+      const quotes = provider.plans.map(plan => ({
+        name:       plan.name,
+        coverage:   plan.coverage,
+        deductible: plan.deductible,
+        price:      calcQuote(plan.base, data.dob, data.depDate, data.retDate, data.coverage)
+      }));
+
+      renderLoadedCard(provider, quotes, data);
+      allQuoteData.push({ provider, quotes });
+      carriersReady++;
+      document.getElementById('carriers-ready-badge').textContent = `${carriersReady} of 5 Ready`;
+
+      if (carriersReady === 5) {
+        document.getElementById('fetch-status-text').textContent = 'All carriers ready — quotes fetched successfully.';
+        setStep(3);
+        populateCompareTable(allQuoteData);
       }
-      if (lastType === type) return;
-      let html = '';
-      if (type === 'life') {
-        html = `
-          <div class="row g-4">
-            <div class="col-md-3"><label for="lifeAge" class="form-label fw-semibold">Age (client)</label><input type="number" class="form-control" id="lifeAge" min="18" max="75" value="35" required></div>
-            <div class="col-md-3"><label for="lifeGender" class="form-label fw-semibold">Gender</label><select class="form-select" id="lifeGender"><option>Male</option><option>Female</option></select></div>
-            <div class="col-md-3"><label for="lifeSmoker" class="form-label fw-semibold">Smoker?</label><select class="form-select" id="lifeSmoker"><option>No</option><option>Yes</option></select></div>
-            <div class="col-md-3"><label for="lifeTerm" class="form-label fw-semibold">Term (years)</label><input type="number" class="form-control" id="lifeTerm" value="20" min="5" max="40" required></div>
-            <div class="col-md-4"><label for="lifeCover" class="form-label fw-semibold">Sum assured (AED)</label><input type="number" class="form-control" id="lifeCover" value="500000" min="100000" step="50000" required></div>
-            <div class="col-md-4"><label for="lifeHealth" class="form-label fw-semibold">Health class</label><select class="form-select" id="lifeHealth"><option>Preferred</option><option>Standard</option><option>High risk (rated)</option></select></div>
-            <div class="col-md-4"><label for="lifeRider" class="form-label fw-semibold">Rider (optional)</label><select class="form-select" id="lifeRider"><option>None</option><option>Critical illness</option><option>Total disability</option></select></div>
-          </div>
-        `;
-      } else if (type === 'travel') {
-        html = `
-          <div class="row g-4">
-            <div class="col-md-4"><label for="travelDest" class="form-label fw-semibold">Destination region</label><select class="form-select" id="travelDest"><option>Schengen</option><option>UK / Ireland</option><option>USA / Canada</option><option>UAE / GCC</option><option>Asia</option><option>Worldwide</option></select></div>
-            <div class="col-md-2"><label for="travelDays" class="form-label fw-semibold">Days</label><input type="number" class="form-control" id="travelDays" value="14" min="1" max="365" required></div>
-            <div class="col-md-3"><label for="travelPersons" class="form-label fw-semibold">Travelers</label><input type="number" class="form-control" id="travelPersons" value="1" min="1" max="10" required></div>
-            <div class="col-md-3"><label for="travelAge" class="form-label fw-semibold">Age of main traveler</label><input type="number" class="form-control" id="travelAge" value="32" min="18" max="80" required></div>
-            <div class="col-md-6"><label for="travelCoverType" class="form-label fw-semibold">Coverage type</label><select class="form-select" id="travelCoverType"><option>Medical only</option><option>Medical + cancellation</option><option>Comprehensive (baggage, delay)</option></select></div>
-            <div class="col-md-6"><label for="travelTripCost" class="form-label fw-semibold">Trip cost (AED, if applicable)</label><input type="number" class="form-control" id="travelTripCost" value="5000" min="0"></div>
-          </div>
-        `;
-      }
-      dynamicDiv.innerHTML = html;
-      lastType = type;
-    }
-    typeSelect.addEventListener('change', (e) => renderFields(e.target.value));
+    }, delays[idx]);
+  });
+}
 
-    // Handle form submit
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+/* ─── Edit Form ───────────────────────────────────────── */
+function editForm() {
+  document.getElementById('step1').scrollIntoView({ behavior: 'smooth' });
+  setStep(1);
+}
 
-      const name = document.getElementById('clientName').value.trim();
-      const contact = document.getElementById('clientContact').value.trim();
-      const type = typeSelect.value;
-      if (!name || !contact || !type) {
-        alert('Please fill client name, contact and insurance type.');
-        return;
-      }
+/* ─── Print ───────────────────────────────────────────── */
+function printQuotes() {
+  document.getElementById('print-modal').classList.add('open');
+}
+function closePrintModal() {
+  document.getElementById('print-modal').classList.remove('open');
+}
+function doPrint() {
+  closePrintModal();
+  setTimeout(() => window.print(), 300);
+}
 
-      // Collect dynamic fields
-      let formData = { name, contact, type };
-      if (type === 'life') {
-        formData.age = document.getElementById('lifeAge')?.value;
-        formData.gender = document.getElementById('lifeGender')?.value;
-        formData.smoker = document.getElementById('lifeSmoker')?.value;
-        formData.term = document.getElementById('lifeTerm')?.value;
-        formData.cover = document.getElementById('lifeCover')?.value;
-        formData.health = document.getElementById('lifeHealth')?.value;
-        formData.rider = document.getElementById('lifeRider')?.value;
-      } else if (type === 'travel') {
-        formData.destination = document.getElementById('travelDest')?.value;
-        formData.days = document.getElementById('travelDays')?.value;
-        formData.travelers = document.getElementById('travelPersons')?.value;
-        formData.age = document.getElementById('travelAge')?.value;
-        formData.coverType = document.getElementById('travelCoverType')?.value;
-        formData.tripCost = document.getElementById('travelTripCost')?.value;
-      }
-
-      // Show loading
-      resultsDiv.style.display = 'block';
-      resultsList.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-gorya" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2">Retrieving live quotes from carrier portals...</p></div>';
-
-      try {
-        // ✅ FIXED: Use relative URL (same origin)
-        const BACKEND_URL = '/api/get-quote';
-        const response = await fetch(BACKEND_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData)
-        });
-
-        if (!response.ok) throw new Error(`Server error: ${response.status}`);
-        const data = await response.json();
-
-        // Display quotes
-        displayQuotes(data.quotes, name, contact, formData);
-      } catch (error) {
-        resultsList.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
-      }
-    });
-
-    function displayQuotes(quotes, name, contact, formData) {
-      let details = '';
-      if (formData.type === 'life') {
-        details = `Age ${formData.age}, ${formData.gender}, ${formData.smoker}, ${formData.health}, sum assured ${Number(formData.cover).toLocaleString()} AED, term ${formData.term} years, rider: ${formData.rider}`;
-      } else {
-        details = `${formData.destination}, ${formData.days} days, ${formData.travelers} traveler(s), age ${formData.age}, cover: ${formData.coverType}`;
-      }
-      let resultHtml = `<p class="mb-4"><span class="fw-bold">${name}</span> · ${contact}<br><span class="text-muted">${details}</span></p>`;
-      (quotes || []).forEach(q => {
-        let stars = '';
-        for (let i=0; i<5; i++) stars += i < Math.floor(q.rating) ? '★' : '☆';
-        resultHtml += `
-          <div class="card result-card mb-3 p-3">
-            <div class="d-flex align-items-center">
-              <i class="bi ${q.logoIcon || 'bi-shield-check'} fs-2 text-gorya me-3"></i>
-              <div class="flex-grow-1">
-                <div class="d-flex flex-wrap align-items-center">
-                  <h5 class="mb-0 me-3">${q.company}</h5>
-                  <span class="rating-star me-2">${stars}</span><span class="text-muted small">${q.rating}</span>
-                </div>
-                <div class="mt-1">${(q.features || []).map(f => `<span class="feature-badge me-1">${f}</span>`).join('')}</div>
-              </div>
-              <div class="text-end">
-                <span class="premium-large">${q.premium.toLocaleString()} AED</span><br>
-                <span class="text-muted small">${formData.type==='life'?'annual':'total premium'}</span>
-              </div>
-            </div>
-          </div>
-        `;
-      });
-      resultsList.innerHTML = resultHtml;
-    }
-
-    renderFields('');
-  })();
+/* ─── Init: set min dates ─────────────────────────────── */
+(function init() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('dep-date').min = today;
+  document.getElementById('ret-date').min = today;
+  document.getElementById('dep-date').addEventListener('change', function() {
+    if (document.getElementById('ret-date').value < this.value)
+      document.getElementById('ret-date').value = '';
+    document.getElementById('ret-date').min = this.value;
+  });
+})();
 </script>
 </body>
 </html>
